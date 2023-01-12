@@ -49,127 +49,111 @@ let isGameOver = true;
 const colors = ['#4B8B70', '#5B967D', '#6AA089', '#78A994', '#84B19E', '#DD8F79', '#DA846C', '#D6785D', '#D26A4D', '#CE5B3B'];
 
 let tiles = [ ];
+let score = 0;
 
-
-
-const swipeUp = () => {
-	let seen = [];
-	while (tiles.length != 0) {
-		tiles.sort((t1, t2) => t1.row < t2.row);
-		const tile = tiles.shift();
-
-		let remove = false;
-		for (let r = tile.row - 1; r >= 0; r--) {
-			const tb = tileAt(r, tile.col); // tb: tile before
-			if (!tb) {
-				tile.row--;
+const swipe = (dir) => {
+	let currScore = 0;
+	for (let i = 0; i < 4; i++) {
+		switch(dir) {
+			case 'up': {
+				let col = tiles.filter(t => t.col == i).sort((t1, t2) => t1.row > t2.row);
+				if (col && col.length > 0) {
+					col[0].row = 0;
+					let merged = false;
+					for (let i = 1; i < col.length; i++) {
+						let curr = col[i];
+						let prev = col[i-1];
+						curr.row = prev.row + 1;
+		
+						if (curr.lvl == prev.lvl && !merged) {
+							prev.lvl++;
+							col = col.filter((t, j) => i != j);
+							tiles = tiles.filter(t => t != curr);
+							i--;
+							currScore += Math.pow(2, prev.lvl + 1);
+							merged = true;
+							continue;
+						}
+					}
+				}
 			}
-			else if (tb.lvl == tile.lvl) {
-				tb.lvl++;
-				remove = true;
 				break;
+			case 'down': {
+				let col = tiles.filter(t => t.col == i).sort((t1, t2) => t1.row < t2.row);
+				if (col && col.length > 0) {
+					col[0].row = 3;
+					let merged = false;
+					for (let i = 1; i < col.length; i++) {
+						let curr = col[i];
+						let prev = col[i-1];
+						curr.row = prev.row - 1;
+		
+						if (curr.lvl == prev.lvl && !merged) {
+							prev.lvl++;
+							col = col.filter((t, j) => i != j);
+							tiles = tiles.filter(t => t != curr);
+							i--;
+							currScore += Math.pow(2, prev.lvl + 1);
+							merged = true;
+							continue;
+						}
+					}
+				}
+
 			}
-		}
-		if (remove) {
-			tiles.filter(t => t != tile);
-		}
-		else {
-			seen.push(tile);
+				break; 
+			case 'left': {
+				let col = tiles.filter(t => t.row == i).sort((t1, t2) => t1.col > t2.col);
+				if (col && col.length > 0) {
+					col[0].col = 0;
+					let merged = false;
+					for (let i = 1; i < col.length; i++) {
+						let curr = col[i];
+						let prev = col[i-1];
+						curr.col = prev.col + 1;
+		
+						if (curr.lvl == prev.lvl && !merged) {
+							prev.lvl++;
+							col = col.filter((t, j) => i != j);
+							tiles = tiles.filter(t => t != curr);
+							i--;
+							currScore += Math.pow(2, prev.lvl + 1);
+							merged = true;
+							continue;
+						}
+					}
+				}
+			}
+				break; 
+			case 'right': {
+				let col = tiles.filter(t => t.row == i).sort((t1, t2) => t1.col < t2.col);
+				if (col && col.length > 0) {
+					col[0].col = 3;
+					let merged = false;
+					for (let i = 1; i < col.length; i++) {
+						let curr = col[i];
+						let prev = col[i-1];
+						curr.col = prev.col - 1;
+		
+						if (curr.lvl == prev.lvl && !merged) {
+							prev.lvl++;
+							col = col.filter((t, j) => i != j);
+							tiles = tiles.filter(t => t != curr);
+							i--;
+							currScore += Math.pow(2, prev.lvl + 1);
+							merged = true;
+							continue;
+						}
+					}
+				}
+			}
+			break; 
 		}
 	}
-	tiles = seen;
-	console.log('tiles: ', tiles);
+	addTile();
+	
+	score += currScore;
 }
-
-
-const swipeDown = () => {
-	let seen = [];
-	while (tiles.length != 0) {
-		tiles.sort((t1, t2) => t1.row > t2.row);
-		const tile = tiles.shift();
-
-		let remove = false;
-		for (let r = tile.row + 1; r < 4; r++) {
-			const tb = tileAt(r, tile.col); // tb: tile before
-			if (!tb) {
-				tile.row++;
-			}
-			else if (tb.lvl == tile.lvl) {
-				tb.lvl++;
-				remove = true;
-				break;
-			}
-		}
-		if (remove) {
-			tiles.filter(t => t != tile);
-		}
-		else {
-			seen.push(tile);
-		}
-	}
-	tiles = seen;
-	console.log('tiles: ', tiles);
-}
-
-const swipeLeft = () => {
-	let seen = [];
-	while (tiles.length != 0) {
-		tiles.sort((t1, t2) => t1.col < t2.col);
-		const tile = tiles.shift();
-
-		let remove = false;
-		for (let c = tile.col - 1; c >= 0; c--) {
-			const tb = tileAt(tile.row, c); // tb: tile before
-			if (!tb) {
-				tile.col--;
-			}
-			else if (tb.lvl == tile.lvl) {
-				tb.lvl++;
-				remove = true;
-				break;
-			}
-		}
-		if (remove) {
-			tiles.filter(t => t != tile);
-		}
-		else {
-			seen.push(tile);
-		}
-	}
-	tiles = seen;
-	console.log('tiles: ', tiles);
-}
-
-const swipeRight = () => {
-	let seen = [];
-	while (tiles.length != 0) {
-		tiles.sort((t1, t2) => t1.col > t2.col);
-		const tile = tiles.shift();
-
-		let remove = false;
-		for (let c = tile.col + 1; c < 4; c++) {
-			const tb = tileAt(tile.row, c); // tb: tile before
-			if (!tb) {
-				tile.col++;
-			}
-			else if (tb.lvl == tile.lvl) {
-				tb.lvl++;
-				remove = true;
-				break;
-			}
-		}
-		if (remove) {
-			tiles.filter(t => t != tile);
-		}
-		else {
-			seen.push(tile);
-		}
-	}
-	tiles = seen;
-	console.log('tiles: ', tiles);
-}
-
-
 
 const tileAt = (r, c) => tiles.find(t => t.row == r && t.col == c);
 const addTile = () => {
@@ -207,47 +191,40 @@ const draw = () => {
 	}
 };
 
+let lastMoves = [];
 window.onkeydown = (event) => { 
 	if (isGameOver) {
 		return;
 	}
-	let force = false;
 
+	let move = undefined;
 	switch (event.key) {
 		case 'w':
 		case 'W':
 		case 'ArrowUp': {	
-			swipeUp();
-			force = true;
-		
+			move = 'up';
 		}; break;
 		case 's':
 		case 'S':
 		case 'ArrowDown': {
-			swipeDown();
-			force = true;
-		
+			move = 'down';	
 		}; break;
 		case 'a':
 		case 'A':
 		case 'ArrowLeft': {
-			swipeLeft();
-			force = true;
-				
+			move = 'left';
 		}; break;
 		case 'd':
 		case 'D':
 		case 'ArrowRight': {
-			swipeRight();
-			force = true;
-				
+			move = 'right';
 		}; break;
 		case ' ': {
 		}; break;
 	}
-	if (force) {
-		addTile();
-		forceUpdate();
+
+	if (move) {
+		swipe(move);
 	}
 };
 
@@ -257,10 +234,13 @@ const reset = () => {
 	}
 	gameLoop = setInterval(update, speed);
 	pullScores();
+	lastMoves = [];
+	score = 0;
 
 	while (tiles.length != 0) {
 		tiles.pop();
 	}
+
 	addTile();
 
 	const el = document.getElementById('game');
@@ -288,9 +268,8 @@ const gameOver = () => {
 let scores = [];
 
 const pushScore = () => {
-	//const score = snakes.length * 5;
-	//scores.push(score);
-	//localStorage.setItem('scores', JSON.stringify(scores));
+	scores.push(score);
+	localStorage.setItem('scores', JSON.stringify(scores));
 }
 const pullScores = () => {
 
