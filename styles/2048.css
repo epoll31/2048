@@ -35,6 +35,17 @@ body > * {
 	align-items: center;
 }
 
+body > .title {
+	font-size: 4em;
+	margin-top: 4rem;
+	margin-bottom: 1rem;
+}
+body.paused > .title {
+	font-size: 5em;
+	margin-top: 3rem;
+	margin-bottom: 1rem;
+}
+
 .game {
 	flex: 1 1 60%;
 	aspect-ratio: 1 / 1;
@@ -44,6 +55,7 @@ body > * {
 	border-radius: 15px;
 	background-color: #A0B2A6;
 
+	position: relative;
 	display: grid;
 	grid-template: 1fr / 1fr;
 }
@@ -53,15 +65,48 @@ body > * {
 	grid-area: 1 / 1 / span 1 / span 1;
 	width: 100%;
 	height: 100%;
+	
 }
-.game:not(.paused) > :not(canvas) {
+.game > .ui {
+	z-index: 0;
+}
+
+body:not(.paused) > .game > .ui {
 	display: none;
 }
-.game.paused > * {
+body.paused > .game > * {
 	display: flex;
 	flex-flow: row nowrap;
 	justify-content: center;
 	align-items: center;
+}
+.game > .board {
+	position: relative;
+}
+.game > .board > * {
+	position: absolute;
+	width: 21.75%;
+	aspect-ratio: 1 / 1;
+	right: auto;
+	bottom: auto;
+	padding: 0;
+	margin: 0;
+
+	font-size: 3em;
+
+	color: #493843;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	transition: all 150ms;
+
+	background-color: transparent;
+	border: solid #493843;
+	border-radius: 15px;
+	border-spacing: 5%;
+	box-sizing: border-box;
+
 }
 
 button {
@@ -124,7 +169,6 @@ footer {
 footer > :last-child {
 	grid-area: 3 / 1 / span 1 / span 2;
 }
-
 
 .scores {
 	display: flex;

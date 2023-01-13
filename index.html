@@ -6,12 +6,13 @@
 
 		<script type='text/javascript' src='scripts/2048.js'></script>
 	</head>
-	<body>
-		<h1>2048</h1>
+	<body class='paused'>
+		<h1 id='title' class='title'>2048</h1>
 
-		<div id='game' class='game paused'>
-			<canvas id='canvas' width="400" height="400" ></canvas>
-			<div>		
+		<div id='game' class='game'>
+			<div id='board' class='board'></div>
+			<!--canvas id='canvas' width="400" height="400" ></canvas-->
+			<div class='ui'>		
 				<button onclick="reset()">play</button>
 			</div>
 		</div>

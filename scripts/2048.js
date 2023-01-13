@@ -1,52 +1,16 @@
 
-window.onload = (_) => {
-	gfx.canvas = document.getElementById('canvas');
-	gfx.ctx = gfx.canvas.getContext("2d");
 
+
+
+window.onload = (_) => {
 	pullScores();
 }
-const gfx = {
-	draw: (tile) => {
-		let s = gfx.canvas.width / 4;
-		let r = 0.15 * s;
 
-
-		let x0 = tile.col * s;
-		let y0 = tile.row * s;
-		let x1 = x0 + r / 4;
-		let y1 = y0 + r / 4;
-		let x2 = x0 + s - r / 4;
-		let y2 = y0 + s - r / 4;
-			
-		gfx.ctx.fillStyle = colors[tile.lvl];
-  	gfx.ctx.beginPath();
-  	gfx.ctx.moveTo(x1 + r, y1);
-  	gfx.ctx.arcTo(x2, y1, x2, y2, r);
-  	gfx.ctx.arcTo(x2, y2, x1, y2, r);
-  	gfx.ctx.arcTo(x1, y2, x1, y1, r);
-  	gfx.ctx.arcTo(x1, y1, x2, y1, r);
-  	gfx.ctx.closePath();
-		gfx.ctx.fill();
-		gfx.ctx.fillStyle = '#EABDA8';
-		gfx.ctx.font = '2em Comfortaa'; 
-		gfx.ctx.textAlign = 'center';
-		gfx.ctx.textBaseline = 'middle';
-		gfx.ctx.fillText(
-			Math.pow(2, tile.lvl + 1),
-			x0 + s / 2, 
-			y0 + s / 2,
-			s);
-	},
-	
-	clear: () => {
-		gfx.ctx.clearRect(0, 0, gfx.canvas.width, gfx.canvas.height);
-	}
-};
-const speed = 300;
+const speed = 10;
 let gameLoop = undefined;
 let isGameOver = true;
 
-const colors = ['#4B8B70', '#5B967D', '#6AA089', '#78A994', '#84B19E', '#DD8F79', '#DA846C', '#D6785D', '#D26A4D', '#CE5B3B'];
+const colors = "daa588-d2916e-ca7d53-e0a167-db924e-d58234-f56960-dc6587-c261aee-74b28d-80d1a8-8bf0c3".split('-');
 
 let tiles = [ ];
 let score = 0;
@@ -68,7 +32,7 @@ const swipe = (dir) => {
 						if (curr.lvl == prev.lvl && !merged) {
 							prev.lvl++;
 							col = col.filter((t, j) => i != j);
-							tiles = tiles.filter(t => t != curr);
+							removeTile(curr);
 							i--;
 							currScore += Math.pow(2, prev.lvl + 1);
 							merged = true;
@@ -77,7 +41,7 @@ const swipe = (dir) => {
 					}
 				}
 			}
-				break;
+			break;
 			case 'down': {
 				let col = tiles.filter(t => t.col == i).sort((t1, t2) => t1.row < t2.row);
 				if (col && col.length > 0) {
@@ -91,7 +55,7 @@ const swipe = (dir) => {
 						if (curr.lvl == prev.lvl && !merged) {
 							prev.lvl++;
 							col = col.filter((t, j) => i != j);
-							tiles = tiles.filter(t => t != curr);
+							removeTile(curr);
 							i--;
 							currScore += Math.pow(2, prev.lvl + 1);
 							merged = true;
@@ -101,7 +65,7 @@ const swipe = (dir) => {
 				}
 
 			}
-				break; 
+			break; 
 			case 'left': {
 				let col = tiles.filter(t => t.row == i).sort((t1, t2) => t1.col > t2.col);
 				if (col && col.length > 0) {
@@ -115,7 +79,7 @@ const swipe = (dir) => {
 						if (curr.lvl == prev.lvl && !merged) {
 							prev.lvl++;
 							col = col.filter((t, j) => i != j);
-							tiles = tiles.filter(t => t != curr);
+							removeTile(curr);
 							i--;
 							currScore += Math.pow(2, prev.lvl + 1);
 							merged = true;
@@ -124,7 +88,7 @@ const swipe = (dir) => {
 					}
 				}
 			}
-				break; 
+			break; 
 			case 'right': {
 				let col = tiles.filter(t => t.row == i).sort((t1, t2) => t1.col < t2.col);
 				if (col && col.length > 0) {
@@ -138,7 +102,7 @@ const swipe = (dir) => {
 						if (curr.lvl == prev.lvl && !merged) {
 							prev.lvl++;
 							col = col.filter((t, j) => i != j);
-							tiles = tiles.filter(t => t != curr);
+							removeTile(curr);
 							i--;
 							currScore += Math.pow(2, prev.lvl + 1);
 							merged = true;
@@ -151,8 +115,9 @@ const swipe = (dir) => {
 		}
 	}
 	addTile();
-	
+	update();
 	score += currScore;
+ document.getElementById('title').innerText = score;
 }
 
 const tileAt = (r, c) => tiles.find(t => t.row == r && t.col == c);
@@ -165,35 +130,62 @@ const addTile = () => {
 	const tile = {
 		row: 0,
 		col: 0,
-		lvl: 0
+		lvl: Math.round(Math.random()),
+		el: document.createElement('p')
 	};
+
+	document.getElementById('board').appendChild(tile.el);
 
 	do {
 		tile.row = Math.floor(Math.random() * 4);
 		tile.col = Math.floor(Math.random() * 4);
 			
-		} while (tileAt(tile.row, tile.col));
+	} while (tileAt(tile.row, tile.col));
 
+	tile.el.innerText = Math.pow(2, tile.lvl + 1);
+	tile.el.style.left = 25 * tile.col + '%';
+	tile.el.style.top = 25 * tile.row + '%';
 	tiles.push(tile);
 };
+const removeTile = (tile) => {
+	tiles = tiles.filter(t => t != tile);
+	document.getElementById('board').removeChild(tile.el);
+}
 
 const update = () => {
-	
+	tiles.forEach(tile => {
+		tile.el.innerText = Math.pow(2, tile.lvl + 1);
+
+		tile.el.style.left = (2.5 + 23.75 * tile.col + 1) + '%';
+		tile.el.style.top = (2.5 + 23.75 * tile.row + 1) + '%';
+		const a = Math.round((Math.min(1, Math.max(0, ((11 - tile.lvl) / 10))) + Number.EPSILON) * 100) / 100
+		
+		tile.el.style.backgroundColor = '#' + colors[Math.min(tile.lvl, colors.length - 1)];
+
+		if (tile.lvl > 18) {
+			tile.el.style.fontSize = '1em';
+		}
+		else if (tile.lvl > 16) {
+			tile.el.style.fontSize = '1.25em';
+		}
+		else if (tile.lvl > 10) {
+			tile.el.style.fontSize = '2em';
+		}
+		else if (tile.lvl > 8) {
+			tile.el.style.fontSize = '2.5em';
+		}
+
+ 
+	});
 };
 
-const draw = () => {
-	gfx.clear();
-	
-	tiles.forEach(gfx.draw);
 
-	if (!isGameOver) {
-		requestAnimationFrame(draw);
-	}
-};
-
-let lastMoves = [];
 window.onkeydown = (event) => { 
 	if (isGameOver) {
+		if (event.key === ' ') {
+			reset();
+		}
+
 		return;
 	}
 
@@ -220,6 +212,7 @@ window.onkeydown = (event) => {
 			move = 'right';
 		}; break;
 		case ' ': {
+
 		}; break;
 	}
 
@@ -238,29 +231,23 @@ const reset = () => {
 	score = 0;
 
 	while (tiles.length != 0) {
-		tiles.pop();
+		removeTile(tiles[0]);
 	}
 
 	addTile();
+	addTile();
 
-	const el = document.getElementById('game');
-	el.classList.remove('paused');
+	document.body.classList.remove('paused');
 
-
-	requestAnimationFrame(draw);
 	isGameOver = false;
 };
 
-const forceUpdate = () => {
-	update();
-	draw();
-}
 const gameOver = () => {
 	isGameOver = true;
 
 	pushScore();	
-	const el = document.getElementById('game');
-	el.classList.add('paused');	
+	pullScores();	
+	document.body.classList.add('paused');	
 		
 	clearInterval(gameLoop);
 }
