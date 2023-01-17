@@ -24,49 +24,36 @@ body {
 
 	display: flex;
 	flex-flow: column nowrap;
-	justify-content: center;
-	align-items: center;
-}
-
-body > * {
-	flex: 1 1 auto;
-	display: flex;
-	justify-content: center;
 	align-items: center;
 }
 
 body > .title {
+	flex: 1fr 1 auto; 
+
+	margin-top: 1em;
 	font-size: 4em;
-	margin-top: 4rem;
-	margin-bottom: 1rem;
+	
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 body.paused > .title {
-	font-size: 5em;
-	margin-top: 3rem;
-	margin-bottom: 1rem;
+	font-size: 4em;
 }
 
 .game {
-	flex: 1 1 60%;
+	flex: 1 1 auto;
 	aspect-ratio: 1 / 1;
 	max-width: calc(100vw - 5rem);
-
-	border: solid 5px #61988E;
-	border-radius: 15px;
-	background-color: #A0B2A6;
-
-	position: relative;
-	display: grid;
-	grid-template: 1fr / 1fr;
-}
-
-
-.game > *{
-	grid-area: 1 / 1 / span 1 / span 1;
-	width: 100%;
-	height: 100%;
+	margin: 1rem;
 	
+	position: relative;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
 }
+
 .game > .ui {
 	z-index: 0;
 }
@@ -81,7 +68,18 @@ body.paused > .game > * {
 	align-items: center;
 }
 .game > .board {
-	position: relative;
+	position: absolute;
+	margin: auto;
+
+	width: 100%;
+	height: auto;
+
+	aspect-ratio: 1/1;
+
+	border: solid 5px #61988E;
+	border-radius: 15px;
+	background-color: #A0B2A6;
+
 }
 .game > .board > * {
 	position: absolute;
@@ -120,6 +118,8 @@ button {
 }
 
 footer {
+	flex: 1fr 1 auto;
+
 	display: grid;
 	grid-template: auto auto auto / 1fr 1fr;
 	
@@ -130,10 +130,13 @@ footer {
 	align-items: center;
 }
 
-.controls {
+footer > h2 {
+	grid-row: 1;
+}
 
+.controls {
 	display: flex;
-	flex-flow: row nowrap;
+	flex-flow: row wrap;
 	justify-content: center;
 	align-items: center;
 	gap: 1rem;
@@ -184,4 +187,18 @@ footer > :last-child {
 	font-size: 1.5em;
 }
 
+@media (max-width: 600px) {
 
+	footer {
+		display: flex;
+		flex-flow: column nowrap;
+	}
+
+	.scores {
+		flex-direction: row;
+	}
+
+	.nomobile {
+		display: none;
+	}
+}

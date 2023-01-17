@@ -1,9 +1,40 @@
+let startX;
+let startY;
 
 
 
 
 window.onload = (_) => {
 	pullScores();
+
+	const board = document.getElementById('board');
+	board.ontouchstart = (event) => {
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+	};
+
+	board.ontouchend = (event) => {
+    const endX = event.changedTouches[0].clientX;
+    const endY = event.changedTouches[0].clientY;
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 0) {
+          console.log("Right swipe");
+      } else {
+        console.log("Left swipe");
+      }
+    } else {
+      if (deltaY > 0) {
+          console.log("Down swipe");
+      } else {
+        console.log("Up swipe");
+      }
+    }
+	};
+
 }
 
 const speed = 10;
